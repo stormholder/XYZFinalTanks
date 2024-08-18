@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace XYZFinalTanks.Tanks;
+﻿namespace XYZFinalTanks.Tanks;
 
 internal class CollisionManager
 {
+    private static CollisionManager? instance;
+    private CollisionManager() { }
+
+    public static CollisionManager GetInstance()
+    {
+        instance ??= new CollisionManager();
+        return instance;
+    }
 }
