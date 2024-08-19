@@ -14,11 +14,11 @@ internal class ShowTextState : GameStateBase
         this._duration = duration;
         Reset();
     }
-    public override void Draw(ConsoleRenderer renderer)
+    public override void Render(IRenderer renderer)
     {
         var textHalfLength = text.Length / 2;
-        var textY = renderer.height / 2;
-        var textX = renderer.width / 2 - textHalfLength;
+        var textY = renderer.GetHeight() / 2;
+        var textX = renderer.GetWidth() / 2 - textHalfLength;
         renderer.DrawString(text, textX, textY, ConsoleColor.White);
     }
 

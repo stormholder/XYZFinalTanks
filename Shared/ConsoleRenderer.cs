@@ -153,4 +153,8 @@ internal class ConsoleRenderer : IRenderer
 
         return hash;
     }
+
+    public int GetHeight() => height;
+
+    public int GetWidth() => width;
 }
