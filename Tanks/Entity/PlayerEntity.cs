@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace XYZFinalTanks.Tanks.Entity;
 
-namespace XYZFinalTanks.Tanks.Entity;
-
-internal class PlayerEntity : EntityBase
+internal class PlayerEntity : TankEntity
 {
+
 }
