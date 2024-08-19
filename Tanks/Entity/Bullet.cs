@@ -2,23 +2,29 @@
 
 namespace XYZFinalTanks.Tanks.Entity;
 
-internal class BulletEntity : IUpdateable, IRenderable, IDisposable
+internal class Bullet : IUpdateable, IRenderable, IDisposable
 {
     private float _timeToMove = 0f;
-    private Direction direction;
+    private Direction _direction;
     public event Action? OnCollision;
-    const int Tick = 4;
-    const char bullet = '●';
+    const int Tick = 2;
+    const char bullet = 'º';
     private Cell _position;
+    public bool IsDisposed = false;
 
-    public BulletEntity(Cell position)
+    public Bullet(Cell position, Direction direction)
     {
         _position = position;
+        _direction = direction;
     }
+
+    public Direction Direction => _direction;
 
     public void Render(IRenderer renderer)
     {
-       renderer.SetPixel(_position.X, _position.Y, bullet, 2);
+        if (_position.X < 0 || _position.Y < 0 || _position.X >= renderer.GetWidth() || _position.Y >= renderer.GetHeight())
+            return;
+        renderer.SetPixel(_position.X, _position.Y, bullet, 2);
     }
 
     public void Shift(Direction dir)
@@ -48,12 +54,17 @@ internal class BulletEntity : IUpdateable, IRenderable, IDisposable
         if (_timeToMove > 0f)
             return;
         _timeToMove = 1 / (Tick);
-        Shift(direction);
+        Shift(_direction);
+        if (_position.X < 0 || _position.Y < 0)
+        {
+            Dispose();
+        }
         // TODO check collisions with EVERYTHING
     }
 
     public void Dispose()
     {
         // TODO
+        IsDisposed = true;
     }
 }
