@@ -9,7 +9,7 @@ namespace XYZFinalTanks.Tanks.Level;
 internal class LevelModel
 {
     private static LevelModel? instance;
-    private static char[,]? _map;
+    private static Map? _map;
 
     private LevelModel() { }
 
@@ -21,8 +21,8 @@ internal class LevelModel
 
     public static void SetMap(char[,] map)
     {
-        _map = map;
+        _map = new(map);
     }
 
-    public char[,] Map => _map;
+    public Map Map => _map;
 }
