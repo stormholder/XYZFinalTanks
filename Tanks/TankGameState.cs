@@ -5,34 +5,68 @@ using System.Text;
 using System.Threading.Tasks;
 using XYZFinalTanks.Shared;
 using XYZFinalTanks.Shared.State;
+using XYZFinalTanks.Tanks.Entity;
+using XYZFinalTanks.Tanks.Level;
 
 namespace XYZFinalTanks.Tanks;
 
 internal class TankGameState : GameStateBase
 {
+    private float _timeToMove = 0f;
     public int FieldWidth { get; set; }
     public int FieldHeight { get; set; }
     public int Level { get; set; }
     public bool GameOver { get; private set; }
     public bool HasWon { get; private set; }
+    public Map Map { get; set; }
+
+    public PlayerEntity Player = new();
+    public List<EnemyEntity> Enemies = new();
+    public List<Bullet> Bullets = new();
 
     public override void Render(IRenderer renderer)
     {
-        throw new NotImplementedException();
+        Map?.Render(renderer);
+        Player.Render(renderer);
+        foreach (var bullet in Bullets)
+        {
+            if (!bullet.IsDisposed)
+                bullet.Render(renderer);
+        }
+        //foreach (var enemy in Enemies)
+        //{
+        //    enemy.Render(renderer);
+        //}
     }
 
     public override bool IsDone()
     {
-        throw new NotImplementedException();
+        return false;
+        //throw new NotImplementedException();
     }
 
     public override void Reset()
     {
-        throw new NotImplementedException();
+        GameOver = false;
+        HasWon = false;
+        Player.Position = new(7,7);
+        Player.Health = 3;
+        _timeToMove = 0f;
     }
 
     public override void Update(float deltaTime)
     {
-        throw new NotImplementedException();
+        Map?.Update(deltaTime);
+        Player.Update(deltaTime);
+        var bulletsToDispose = Bullets.Where(b => b.IsDisposed).ToList();
+        foreach (var bullet in bulletsToDispose)
+        {
+            Bullets.Remove(bullet);
+        }
+        foreach (var bullet in Bullets)
+        {
+            if (!bullet.IsDisposed)
+                bullet.Update(deltaTime);
+        }
     }
 }
