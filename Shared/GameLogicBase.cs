@@ -13,6 +13,8 @@ internal abstract class GameLogicBase : IArrowListener, IEscListener, IShootList
     public void InitializeInput(ConsoleInput input)
     {
         input.Subscribe(this);
+        input.SubscribeShoot(this);
+        input.SubscribeEsc(this);
     }
 
     protected void ChangeState(GameStateBase? state)

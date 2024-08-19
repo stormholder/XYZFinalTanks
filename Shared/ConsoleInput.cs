@@ -9,6 +9,9 @@ internal class ConsoleInput
     private HashSet<IArrowListener> _arrowListeners = new();
 
     public void Subscribe(IArrowListener listener) { _arrowListeners.Add(listener); }
+    public void SubscribeShoot(IShootListener listener) { _shootListeners.Add(listener); }
+    public void SubscribeEsc(IEscListener listener) { _escListeners.Add(listener); }
+
     public void Update()
     {
         while (Console.KeyAvailable)
