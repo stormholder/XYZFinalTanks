@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using XYZFinalTanks.Shared;
 using XYZFinalTanks.Tanks;
+using XYZFinalTanks.Tanks.Entity;
 using XYZFinalTanks.Tanks.Level;
 
 namespace XYZFinalTanks;
@@ -10,29 +11,28 @@ internal class Program
     const float targetFrameTime = 1f / 60f;
     static void Main(string[] args)
     {
-        //Console.WriteLine("Hello, World!");
-        //const char bullet = '●';
-        //const char wall = '▓';
-        //const char wall_weak = '░';
-        //const char water = '█';
         GameData gameData = new("Resources");
+        var input = new ConsoleInput();
         var renderer0 = new ConsoleRenderer(gameData.Palette);
         var renderer1 = new ConsoleRenderer(gameData.Palette);
         var prevRenderer = renderer0;
         var currRenderer = renderer1;
+        var gameLogic = new TankGameLogic(gameData);
+        gameLogic.InitializeInput(input);
 
-        //gameLogic.InitializeInput(input);
-
-        var map = new Map(gameData.LevelMaps["Level 1"]);
+        //var map = new Map(gameData.LevelMaps[1]);
+        //var bullet = new Bullet(new(40, 10), Direction.Left);
 
         var lastFrameTime = DateTime.Now;
         while (true)
         {
             var frameStartTime = DateTime.Now;
             float deltaTime = (float)(frameStartTime - lastFrameTime).TotalSeconds;
-            //input.Update();
-            //gameLogic.DrawNewState(deltaTime, currRenderer);
-            map.Render(currRenderer);
+            //bullet.Update(deltaTime);
+            input.Update();
+            gameLogic.DrawNewState(deltaTime, currRenderer);
+            //map.Render(currRenderer);
+            //bullet.Render(currRenderer);
             lastFrameTime = frameStartTime;
             if (!currRenderer.Equals(prevRenderer)) currRenderer.Render();
 
