@@ -23,6 +23,22 @@ internal class Map : IRenderable, IUpdateable
         }
     }
 
+    public bool IsValid(Cell cell)
+    {
+        var result = true;
+        if (_map[cell.Y, cell.X] == '█')
+            return false;
+        foreach (var wall in _walls)
+        {
+            if (wall.Position.X == cell.X && wall.Position.Y == cell.Y)
+            {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
     public void Render(IRenderer renderer)
     {
         for (int h = 0; h < _map.GetLength(0); h++)
