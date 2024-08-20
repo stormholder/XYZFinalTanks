@@ -4,8 +4,19 @@ namespace XYZFinalTanks.Tanks.Entity;
 
 internal class TankEntity : EntityBase
 {
+    private float _shootCooldownTime = 1f;
+    private float _moveCooldownTime = 0.3f;
+
+    private float _shootCooldown = 0f;
+    private float _moveCooldown = 0f;
 
     const char body = '@';
+    char[,] bodyParts = new[,]
+    {
+        { '╔', '═', '╗' },
+        { '║', ' ', '║' },
+        { '╚', '═', '╝' },
+    };
     private Direction direction = Direction.Right;
     public Direction Direction { get { return direction; } set { direction = value; } }
 
@@ -14,54 +25,43 @@ internal class TankEntity : EntityBase
         Health = 3;
     }
 
+
+    private bool _canMove = true;
+    private bool _canShoot = true;
+
     protected bool TryChangePosition(Cell newPosition, Map map)
     {
-        if (!map.IsValid(newPosition))
-        {
+        if (!_canMove)
             return false;
-        }
+        if (!map.IsValid(newPosition))
+            return false;
         Position = newPosition;
+        _canMove = false;
         return true;
     }
 
     public virtual bool TryMoveLeft(Map map)
     {
-        var result = TryChangePosition(new Cell(Position.X - 1, Position.Y), map);
-        if (result)
-        {
-            Direction = Direction.Left;
-        }
-        return result;
+        Direction = Direction.Left;
+        return TryChangePosition(new Cell(Position.X - 1, Position.Y), map);
     }
 
     public virtual bool TryMoveRight(Map map)
     {
-        var result = TryChangePosition(new Cell(Position.X + 1, Position.Y), map);
-        if (result)
-        {
-            Direction = Direction.Right;
-        }
-        return result;
+        Direction = Direction.Right;
+        return TryChangePosition(new Cell(Position.X + 1, Position.Y), map);
     }
 
     public virtual bool TryMoveUp(Map map)
     {
-        var result = TryChangePosition(new Cell(Position.X, Position.Y - 1), map);
-        if (result)
-        {
-            Direction = Direction.Up;
-        }
-        return result;
+        Direction = Direction.Up;
+        return TryChangePosition(new Cell(Position.X, Position.Y - 1), map);
     }
 
     public virtual bool TryMoveDown(Map map)
     {
-        var result = TryChangePosition(new Cell(Position.X, Position.Y + 1), map);
-        if (result)
-        {
-            Direction = Direction.Down;
-        }
-        return result;
+        Direction = Direction.Down;
+        return TryChangePosition(new Cell(Position.X, Position.Y + 1), map);
     }
 
     public char GetCanonChar(Direction direction) => direction switch
@@ -81,15 +81,6 @@ internal class TankEntity : EntityBase
         _ => Position
     };
 
-    //public Cell GetBulletSpawnPosition() => direction switch
-    //{
-    //    Direction.Left => new Cell(Position.X - 2, Position.Y),
-    //    Direction.Right => new Cell(Position.X + 2, Position.Y),
-    //    Direction.Down => new Cell(Position.X, Position.Y + 2),
-    //    Direction.Up => new Cell(Position.X, Position.Y - 2),
-    //    _ => Position
-    //};
-
     public override void Dispose()
     {
         //throw new NotImplementedException();
@@ -99,7 +90,14 @@ internal class TankEntity : EntityBase
     {
         if (Health > 0)
         {
-            renderer.SetPixel(Position.X, Position.Y, body, 2);
+            for (var x = 0; x < 3; x++)
+            {
+                for (var y = 0; y < 3; y++)
+                {
+                    renderer.SetPixel(Position.X - 1 + y, Position.Y - 1 + x, bodyParts[x, y], 2);
+                }
+            }
+
             var canon = GetCanonChar(direction);
             var canonPos = GetCanonPosition();
             renderer.SetPixel(canonPos.X, canonPos.Y, canon, 2);
@@ -109,11 +107,27 @@ internal class TankEntity : EntityBase
     public override void Update(float deltaTime)
     {
         //throw new NotImplementedException();
+        _moveCooldown += deltaTime;
+        _shootCooldown += deltaTime;
+        if (_moveCooldown >= _moveCooldownTime)
+        {
+            _moveCooldown = 0;
+            _canMove = true;
+        }
+        if (_shootCooldown >= _shootCooldownTime)
+        {
+            _shootCooldown = 0;
+            _canShoot = true;
+        }
     }
 
-    public virtual Bullet Shoot()
+    public virtual Bullet? Shoot()
     {
-        //var bulletSpawn = GetCanonPosition();
-        return BulletFactory.GetInstance().CreateBullet(Position, direction);
+        if (_canShoot)
+        {
+            _canShoot = false;
+            return BulletFactory.GetInstance().CreateBullet(Position, direction);
+        }
+        return null;
     }
 }
