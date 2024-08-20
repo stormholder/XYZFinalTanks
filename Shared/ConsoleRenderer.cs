@@ -9,7 +9,6 @@ internal class ConsoleRenderer : IRenderer
     private readonly ConsoleColor[] _colors;
     private readonly char[,] _pixels;
     private readonly byte[,] _pixelColors;
-    private char[,] _buffer;
     private readonly int _maxWidth;
     private readonly int _maxHeight;
 
@@ -20,6 +19,8 @@ internal class ConsoleRenderer : IRenderer
         get { return _pixels[w, h]; }
         set { _pixels[w, h] = value; }
     }
+
+    public char GetPixel(int x, int y) => _pixels[x, y];
 
     public ConsoleRenderer(ConsoleColor[] colors)
     {
@@ -38,7 +39,6 @@ internal class ConsoleRenderer : IRenderer
         height = Console.WindowHeight;
 
         _pixels = new char[_maxWidth, _maxHeight];
-        _buffer = new char[_maxWidth, _maxHeight];
         _pixelColors = new byte[_maxWidth, _maxHeight];
         Console.CursorVisible = false;
     }
@@ -50,28 +50,30 @@ internal class ConsoleRenderer : IRenderer
     }
 
 
-    public void Render()
+    public void Render(IRenderer prevRenderer)
     {
-        Console.Clear();
+        //Console.Clear();
         Console.BackgroundColor = bgColor;
 
         for (var w = 0; w < width; w++)
             for (var h = 0; h < height; h++)
             {
-                //if (_buffer[w, h] == _pixels[w, h])
-                //    continue;
+                if (prevRenderer.GetPixel(w, h) == _pixels[w, h])
+                    continue;
                 var colorIdx = _pixelColors[w, h];
                 var color = _colors[colorIdx];
                 var symbol = _pixels[w, h];
 
-                if (symbol == 0 || color == bgColor)
+                if (symbol == 0 || color == bgColor) {
+                    Console.SetCursorPosition(w, h);
+                    Console.Write(' ');
                     continue;
+                }
 
                 Console.ForegroundColor = color;
 
                 Console.SetCursorPosition(w, h);
                 Console.Write(symbol);
-                _buffer[w, h] = _pixels[w, h];
             }
 
         Console.ResetColor();
@@ -93,9 +95,6 @@ internal class ConsoleRenderer : IRenderer
 
     public void Clear()
     {
-        //_buffer = new char[width, height];
-        //Console.CursorVisible = true;
-        //Console.Clear();
         for (int w = 0; w < width; w++)
             for (int h = 0; h < height; h++)
             {
