@@ -34,6 +34,11 @@ internal class Map : IRenderable, IUpdateable
     public bool IsValid(Cell cell)
     {
         var result = true;
+        if (cell.X < 0 ||
+            cell.Y < 0 ||
+            cell.X >= Width ||
+            cell.Y >= Height)
+            return false;
         foreach (var w in _water)
         {
             if (w.Position.X == cell.X && w.Position.Y == cell.Y)
