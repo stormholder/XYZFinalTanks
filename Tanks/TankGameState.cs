@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using XYZFinalTanks.Shared;
 using XYZFinalTanks.Shared.State;
 using XYZFinalTanks.Tanks.Entity;
-using XYZFinalTanks.Tanks.Level;
 
 namespace XYZFinalTanks.Tanks;
 
 internal class TankGameState : GameStateBase
 {
     private float _timeToMove = 0f;
+    //public LevelModel LevelModel = LevelModel.GetInstance();
     public int FieldWidth { get; set; }
     public int FieldHeight { get; set; }
     public int Level { get; set; }
@@ -26,7 +26,7 @@ internal class TankGameState : GameStateBase
 
     public override void Render(IRenderer renderer)
     {
-        Map?.Render(renderer);
+        Map.Render(renderer);
         Player.Render(renderer);
         foreach (var bullet in Bullets)
         {
@@ -56,17 +56,37 @@ internal class TankGameState : GameStateBase
 
     public override void Update(float deltaTime)
     {
-        Map?.Update(deltaTime);
+        Map.Update(deltaTime);
         Player.Update(deltaTime);
         var bulletsToDispose = Bullets.Where(b => b.IsDisposed).ToList();
         foreach (var bullet in bulletsToDispose)
         {
             Bullets.Remove(bullet);
         }
+        
         foreach (var bullet in Bullets)
         {
             if (!bullet.IsDisposed)
+            {
+                if (bullet.Position.X < 0 || 
+                    bullet.Position.Y < 0 || 
+                    bullet.Position.X >= Map.Width || 
+                    bullet.Position.Y >= Map.Height)
+                {
+                    bullet.Dispose();
+                }
+                // TODO check collisions with EVERYTHING
+                foreach (var wall in Map.Walls)
+                {
+                    if (wall.Position.X == bullet.Position.X && wall.Position.Y == bullet.Position.Y)
+                    {
+                        wall.Health--;
+                        bullet.Dispose();
+                        break;
+                    }
+                }
                 bullet.Update(deltaTime);
+            }
         }
     }
 }

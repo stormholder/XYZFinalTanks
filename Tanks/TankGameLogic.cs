@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XYZFinalTanks.Shared;
+﻿using XYZFinalTanks.Shared;
 using XYZFinalTanks.Shared.State;
-using XYZFinalTanks.Tanks.Level;
 
 namespace XYZFinalTanks.Tanks;
 
@@ -41,7 +35,6 @@ internal class TankGameLogic : GameLogicBase
     {
         _state.Level = currLevel;
         _state.Map = new(gameData.LevelMaps[currLevel]);
-        LevelModel.SetMap(gameData.LevelMaps[currLevel]);
         _state.FieldHeight = screenHeight;
         _state.FieldWidth = screenWidth;
         ChangeState(_state);
@@ -50,25 +43,25 @@ internal class TankGameLogic : GameLogicBase
     public override void OnArrowDown()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveDown();
+        _state.Player.TryMoveDown(_state.Map);
     }
 
     public override void OnArrowLeft()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveLeft();
+        _state.Player.TryMoveLeft(_state.Map);
     }
 
     public override void OnArrowRight()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveRight();
+        _state.Player.TryMoveRight(_state.Map);
     }
 
     public override void OnArrowUp()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveUp();
+        _state.Player.TryMoveUp(_state.Map);
     }
 
     public override void OnEsc()

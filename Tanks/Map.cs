@@ -1,12 +1,13 @@
 ﻿using XYZFinalTanks.Shared;
 using XYZFinalTanks.Tanks.Entity;
 
-namespace XYZFinalTanks.Tanks.Level;
+namespace XYZFinalTanks.Tanks;
 
 internal class Map : IRenderable, IUpdateable
 {
     private char[,] _map;
-    private List<WallEntity> _walls = new();
+    private List<WallEntity> _walls = [];
+    private List<WaterEntity> _water = [];
 
     public Map(char[,] map)
     {
@@ -19,15 +20,28 @@ internal class Map : IRenderable, IUpdateable
                 {
                     _walls.Add(new(w, h));
                 }
+                else if (_map[h, w] == '█')
+                {
+                    _water.Add(new(w, h));
+                }
             }
         }
     }
+    public int Width => _map.GetLength(1);
+    public int Height => _map.GetLength(0);
+    public List<WallEntity> Walls => _walls;
 
     public bool IsValid(Cell cell)
     {
         var result = true;
-        if (_map[cell.Y, cell.X] == '█')
-            return false;
+        foreach (var w in _water)
+        {
+            if (w.Position.X == cell.X && w.Position.Y == cell.Y)
+            {
+                result = false;
+                break;
+            }
+        }
         foreach (var wall in _walls)
         {
             if (wall.Position.X == cell.X && wall.Position.Y == cell.Y)
@@ -41,22 +55,23 @@ internal class Map : IRenderable, IUpdateable
 
     public void Render(IRenderer renderer)
     {
-        for (int h = 0; h < _map.GetLength(0); h++)
-        {
-            for (int w = 0; w < _map.GetLength(1); w++)
-            {
-                if (_map[h,w] == '█')
-                    renderer.SetPixel(w, h, _map[h, w], 3);
-            }
-        }
         foreach (var wall in _walls)
         {
             wall.Render(renderer);
+        }
+        foreach (var w in _water)
+        {
+            w.Render(renderer);
         }
     }
 
     public void Update(float deltaTime)
     {
+        var wallsToDispose = _walls.Where(w => w.IsDisposed).ToList();
+        foreach (var wall in wallsToDispose)
+        {
+            _walls.Remove(wall);
+        }
         foreach (var wall in _walls)
         {
             wall.Update(deltaTime);

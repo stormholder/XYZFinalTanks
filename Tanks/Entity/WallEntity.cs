@@ -2,8 +2,9 @@
 
 namespace XYZFinalTanks.Tanks.Entity;
 
-internal class WallEntity : EntityBase, IUpdateable, IRenderable, IDisposable
+internal class WallEntity : EntityBase
 {
+    public bool IsDisposed { get; private set; } = false;
     const byte colorIdx = 1;
     const char healthy = '▓';
     const char damaged = '░';
@@ -15,12 +16,12 @@ internal class WallEntity : EntityBase, IUpdateable, IRenderable, IDisposable
         Position = new Cell(x, y);
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
-        //throw new NotImplementedException();
+        IsDisposed = true;
     }
 
-    public void Render(IRenderer renderer)
+    public override void Render(IRenderer renderer)
     {
         if (Health > 0)
         {
@@ -28,9 +29,12 @@ internal class WallEntity : EntityBase, IUpdateable, IRenderable, IDisposable
         }
     }
 
-    public void Update(float deltaTime)
+    public override void Update(float deltaTime)
     {
         if (Health <= 0)
+        {
+            Dispose();
             return;
+        }
     }
 }

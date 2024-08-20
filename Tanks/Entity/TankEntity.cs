@@ -1,5 +1,4 @@
 ﻿using XYZFinalTanks.Shared;
-using XYZFinalTanks.Tanks.Level;
 
 namespace XYZFinalTanks.Tanks.Entity;
 
@@ -15,9 +14,9 @@ internal class TankEntity : EntityBase
         Health = 3;
     }
 
-    protected bool TryChangePosition(Cell newPosition)
+    protected bool TryChangePosition(Cell newPosition, Map map)
     {
-        if (!LevelModel.GetInstance().Map.IsValid(newPosition))
+        if (!map.IsValid(newPosition))
         {
             return false;
         }
@@ -25,9 +24,9 @@ internal class TankEntity : EntityBase
         return true;
     }
 
-    public virtual bool TryMoveLeft()
+    public virtual bool TryMoveLeft(Map map)
     {
-        var result = TryChangePosition(new Cell(Position.X - 1, Position.Y));
+        var result = TryChangePosition(new Cell(Position.X - 1, Position.Y), map);
         if (result)
         {
             Direction = Direction.Left;
@@ -35,9 +34,9 @@ internal class TankEntity : EntityBase
         return result;
     }
 
-    public virtual bool TryMoveRight()
+    public virtual bool TryMoveRight(Map map)
     {
-        var result = TryChangePosition(new Cell(Position.X + 1, Position.Y));
+        var result = TryChangePosition(new Cell(Position.X + 1, Position.Y), map);
         if (result)
         {
             Direction = Direction.Right;
@@ -45,9 +44,9 @@ internal class TankEntity : EntityBase
         return result;
     }
 
-    public virtual bool TryMoveUp()
+    public virtual bool TryMoveUp(Map map)
     {
-        var result = TryChangePosition(new Cell(Position.X, Position.Y - 1));
+        var result = TryChangePosition(new Cell(Position.X, Position.Y - 1), map);
         if (result)
         {
             Direction = Direction.Up;
@@ -55,9 +54,9 @@ internal class TankEntity : EntityBase
         return result;
     }
 
-    public virtual bool TryMoveDown()
+    public virtual bool TryMoveDown(Map map)
     {
-        var result = TryChangePosition(new Cell(Position.X, Position.Y + 1));
+        var result = TryChangePosition(new Cell(Position.X, Position.Y + 1), map);
         if (result)
         {
             Direction = Direction.Down;
@@ -82,14 +81,14 @@ internal class TankEntity : EntityBase
         _ => Position
     };
 
-    public Cell GetBulletSpawnPosition() => direction switch
-    {
-        Direction.Left => new Cell(Position.X - 2, Position.Y),
-        Direction.Right => new Cell(Position.X + 2, Position.Y),
-        Direction.Down => new Cell(Position.X, Position.Y + 2),
-        Direction.Up => new Cell(Position.X, Position.Y - 2),
-        _ => Position
-    };
+    //public Cell GetBulletSpawnPosition() => direction switch
+    //{
+    //    Direction.Left => new Cell(Position.X - 2, Position.Y),
+    //    Direction.Right => new Cell(Position.X + 2, Position.Y),
+    //    Direction.Down => new Cell(Position.X, Position.Y + 2),
+    //    Direction.Up => new Cell(Position.X, Position.Y - 2),
+    //    _ => Position
+    //};
 
     public override void Dispose()
     {
@@ -114,7 +113,7 @@ internal class TankEntity : EntityBase
 
     public virtual Bullet Shoot()
     {
-        var bulletSpawn = GetBulletSpawnPosition();
-        return BulletFactory.GetInstance().CreateBullet(bulletSpawn, direction);
+        //var bulletSpawn = GetCanonPosition();
+        return BulletFactory.GetInstance().CreateBullet(Position, direction);
     }
 }

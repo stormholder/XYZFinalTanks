@@ -19,6 +19,7 @@ internal class Bullet : IUpdateable, IRenderable, IDisposable
     }
 
     public Direction Direction => _direction;
+    public Cell Position => _position;
 
     public void Render(IRenderer renderer)
     {
@@ -55,11 +56,27 @@ internal class Bullet : IUpdateable, IRenderable, IDisposable
             return;
         _timeToMove = 1 / (Tick);
         Shift(_direction);
-        if (_position.X < 0 || _position.Y < 0)
-        {
-            Dispose();
-        }
-        // TODO check collisions with EVERYTHING
+        //if (_position.X < 0 || _position.Y < 0)
+        //{
+        //    Dispose();
+        //}
+        //var _lvl = LevelModel.GetInstance();
+        //if (_position.X >= _lvl.Map.Width || _position.Y >= _lvl.Map.Height)
+        //{
+        //    Dispose();
+        //}
+        //// TODO check collisions with EVERYTHING
+        //foreach (var wall in _lvl.Map.Walls)
+        //{
+        //    if (wall.Position.X == _position.X && wall.Position.Y == _position.Y)
+        //    {
+        //        //result = false;
+        //        // TODO reduce wall health
+        //        wall.Health--;
+        //        Dispose();
+        //        break;
+        //    }
+        //}
     }
 
     public void Dispose()
