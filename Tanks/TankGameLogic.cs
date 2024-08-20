@@ -73,7 +73,8 @@ internal class TankGameLogic : GameLogicBase
     {
         if (currentState != _state) return;
         var newBullet = _state.Player.Shoot();
-        _state.Bullets.Add(newBullet);
+        if (newBullet != null)
+            _state.Bullets.Add(newBullet);
     }
 
     public override void Update(float deltaTime)

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XYZFinalTanks.Shared;
+﻿using XYZFinalTanks.Shared;
 using XYZFinalTanks.Shared.State;
 using XYZFinalTanks.Tanks.Entity;
 
@@ -11,8 +6,6 @@ namespace XYZFinalTanks.Tanks;
 
 internal class TankGameState : GameStateBase
 {
-    private float _timeToMove = 0f;
-    //public LevelModel LevelModel = LevelModel.GetInstance();
     public int FieldWidth { get; set; }
     public int FieldHeight { get; set; }
     public int Level { get; set; }
@@ -49,9 +42,8 @@ internal class TankGameState : GameStateBase
     {
         GameOver = false;
         HasWon = false;
-        Player.Position = new(7,7);
+        Player.Position = new(6, 6);
         Player.Health = 3;
-        _timeToMove = 0f;
     }
 
     public override void Update(float deltaTime)
@@ -63,14 +55,14 @@ internal class TankGameState : GameStateBase
         {
             Bullets.Remove(bullet);
         }
-        
+
         foreach (var bullet in Bullets)
         {
             if (!bullet.IsDisposed)
             {
-                if (bullet.Position.X < 0 || 
-                    bullet.Position.Y < 0 || 
-                    bullet.Position.X >= Map.Width || 
+                if (bullet.Position.X < 0 ||
+                    bullet.Position.Y < 0 ||
+                    bullet.Position.X >= Map.Width ||
                     bullet.Position.Y >= Map.Height)
                 {
                     bullet.Dispose();
