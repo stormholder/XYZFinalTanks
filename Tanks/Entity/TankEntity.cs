@@ -10,6 +10,8 @@ internal class TankEntity : EntityBase
     private float _shootCooldown = 0f;
     private float _moveCooldown = 0f;
 
+    protected byte color = 2;
+
     private readonly Dictionary<Direction, char[,]> _views = new Dictionary<Direction, char[,]>
     {
         { Direction.Up, new[,]
@@ -44,12 +46,13 @@ internal class TankEntity : EntityBase
     public TankEntity()
     {
         Health = 3;
-        Speed = 4;
     }
 
 
     private bool _canMove = true;
     private bool _canShoot = true;
+
+    public bool CanShoot => _canShoot;
 
     protected bool TryChangePosition(Cell newPosition, Map map)
     {
@@ -110,13 +113,14 @@ internal class TankEntity : EntityBase
 
     public override void Render(IRenderer renderer)
     {
-        if (Health > 0)
+        if (IsDisposed) return;
+        //if (Health > 0)
         {
             for (var x = 0; x < Position.Height; x++)
             {
                 for (var y = 0; y < Position.Width; y++)
                 {
-                    renderer.SetPixel(Position.X * Position.Width + y, Position.Y * Position.Height + x, _views[direction][x,y], 2);
+                    renderer.SetPixel(Position.X * Position.Width + y, Position.Y * Position.Height + x, _views[direction][x,y], color);
                 }
             }
         }
@@ -124,6 +128,9 @@ internal class TankEntity : EntityBase
 
     public override void Update(float deltaTime)
     {
+        if (Health <= 0)
+            Dispose();
+        if (IsDisposed) return;
         _moveCooldown += deltaTime;
         _shootCooldown += deltaTime;
         if (_moveCooldown >= _moveCooldownTime)
@@ -140,6 +147,7 @@ internal class TankEntity : EntityBase
 
     public virtual Bullet? Shoot()
     {
+        if (IsDisposed) return null;
         if (_canShoot)
         {
             _canShoot = false;

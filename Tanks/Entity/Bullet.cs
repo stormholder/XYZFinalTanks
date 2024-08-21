@@ -21,14 +21,19 @@ internal class Bullet : EntityBase
 
     public override void Render(IRenderer renderer)
     {
-        if (!IsDisposed)
-            for (int i = 0; i < Position.Height; i++)
+        if (IsDisposed || 
+            Position.X < 0 || 
+            Position.Y < 0 || 
+            Position.X >= renderer.GetWidth() || 
+            Position.Y >= renderer.GetHeight())
+            return;
+        for (int i = 0; i < Position.Height; i++)
+        {
+            for (int j = 0; j < Position.Width; j++)
             {
-                for (int j = 0; j < Position.Width; j++)
-                {
-                    renderer.SetPixel(Position.X * Position.Width + j, Position.Y * Position.Height + i, bullet[i, j], 2);
-                }
+                renderer.SetPixel(Position.X * Position.Width + j, Position.Y * Position.Height + i, bullet[i, j], 2);
             }
+        }
     }
 
     public void Shift(Direction dir)
@@ -54,10 +59,13 @@ internal class Bullet : EntityBase
 
     public override void Update(float deltaTime)
     {
-        _timeToMove -= deltaTime;
-        if (_timeToMove > 0f)
-            return;
-        _timeToMove = 1 / Tick;
-        Shift(_direction);
+        if (!IsDisposed)
+        {
+            _timeToMove -= deltaTime;
+            if (_timeToMove > 0f)
+                return;
+            _timeToMove = 1 / Tick;
+            Shift(_direction);
+        }
     }
 }

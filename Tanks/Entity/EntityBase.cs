@@ -7,7 +7,6 @@ internal abstract class EntityBase : IUpdateable, IRenderable, IDisposable
     public bool IsDisposed { get; protected set; } = false;
     public int Health { get; set; }
     public Cell Position { get; set; }
-    public int Speed { get; set; }
 
     public virtual void Dispose()
     {
