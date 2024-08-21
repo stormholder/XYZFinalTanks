@@ -4,25 +4,47 @@ namespace XYZFinalTanks.Tanks.Entity;
 
 internal class TankEntity : EntityBase
 {
-    private float _shootCooldownTime = 1f;
-    private float _moveCooldownTime = 0.3f;
+    public float _shootCooldownTime = 1f;
+    public float _moveCooldownTime = 0.3f;
 
     private float _shootCooldown = 0f;
     private float _moveCooldown = 0f;
 
-    const char body = '@';
-    char[,] bodyParts = new[,]
+    private readonly Dictionary<Direction, char[,]> _views = new Dictionary<Direction, char[,]>
     {
-        { '╔', '═', '╗' },
-        { '║', ' ', '║' },
-        { '╚', '═', '╝' },
+        { Direction.Up, new[,]
+        {
+            { '╔', '╩', '╗', ' ' },
+            { '╚', '═', '╝', ' ' },
+        }
+        },
+        { Direction.Right, new[,]
+        {
+            { '╔', '═', '╗', '_' },
+            { '╚', '═', '╝', 'T' },
+        }
+        },
+        { Direction.Down, new[,]
+        {
+            { '╔', '═', '╗', ' ' },
+            { '╚', '╦', '╝', ' ' },
+        }
+        },
+        { Direction.Left, new[,]
+        {
+            { '_', '╔', '═', '╗' },
+            { 'T', '╚', '═', '╝' },
+        }
+        }
     };
+
     private Direction direction = Direction.Right;
     public Direction Direction { get { return direction; } set { direction = value; } }
 
     public TankEntity()
     {
         Health = 3;
+        Speed = 4;
     }
 
 
@@ -31,82 +53,77 @@ internal class TankEntity : EntityBase
 
     protected bool TryChangePosition(Cell newPosition, Map map)
     {
-        if (!_canMove)
-            return false;
-        if (!map.IsValid(newPosition))
-            return false;
-        Position = newPosition;
-        _canMove = false;
-        return true;
+        return _canMove && map.IsValid(newPosition);
     }
 
     public virtual bool TryMoveLeft(Map map)
     {
         Direction = Direction.Left;
-        return TryChangePosition(new Cell(Position.X - 1, Position.Y), map);
+        bool result = TryChangePosition(new Cell(Position.X - 1, Position.Y), map);
+        if (result)
+        {
+            Position = new Cell(Position.X - 1, Position.Y);
+            _canMove = false;
+            return true;
+        }
+        return false;
     }
 
     public virtual bool TryMoveRight(Map map)
     {
         Direction = Direction.Right;
-        return TryChangePosition(new Cell(Position.X + 1, Position.Y), map);
+        bool result = TryChangePosition(new Cell(Position.X + 1, Position.Y), map);
+        if (result)
+        {
+            Position = new Cell(Position.X + 1, Position.Y);
+            _canMove = false;
+            return true;
+        }
+        return false;
     }
 
     public virtual bool TryMoveUp(Map map)
     {
         Direction = Direction.Up;
-        return TryChangePosition(new Cell(Position.X, Position.Y - 1), map);
+        bool result = TryChangePosition(new Cell(Position.X, Position.Y - 1), map);
+        if (result)
+        {
+            Position = new Cell(Position.X, Position.Y - 1);
+            _canMove = false;
+            return true;
+        }
+        return false;
     }
 
     public virtual bool TryMoveDown(Map map)
     {
         Direction = Direction.Down;
-        return TryChangePosition(new Cell(Position.X, Position.Y + 1), map);
-    }
-
-    public char GetCanonChar(Direction direction) => direction switch
-    {
-        Direction.Up => '▲',
-        Direction.Right => '►',
-        Direction.Down => '▼',
-        Direction.Left => '◄',
-        _ => ' '
-    };
-    public Cell GetCanonPosition() => direction switch
-    {
-        Direction.Left => new Cell(Position.X - 1, Position.Y),
-        Direction.Right => new Cell(Position.X + 1, Position.Y),
-        Direction.Down => new Cell(Position.X, Position.Y + 1),
-        Direction.Up => new Cell(Position.X, Position.Y - 1),
-        _ => Position
-    };
-
-    public override void Dispose()
-    {
-        //throw new NotImplementedException();
+        bool result = TryChangePosition(new Cell(Position.X, Position.Y + 1), map);
+        if (result)
+        {
+            Position = new Cell(Position.X, Position.Y +  1);
+            _canMove = false;
+            return true;
+        }
+        return false;
     }
 
     public override void Render(IRenderer renderer)
     {
         if (Health > 0)
         {
-            for (var x = 0; x < 3; x++)
+            for (var x = 0; x < Position.Height; x++)
             {
-                for (var y = 0; y < 3; y++)
+                for (var y = 0; y < Position.Width; y++)
                 {
-                    renderer.SetPixel(Position.X - 1 + y, Position.Y - 1 + x, bodyParts[x, y], 2);
+                    renderer.SetPixel(Position.X * Position.Width + y, Position.Y * Position.Height + x, _views[direction][x,y], 2);
                 }
             }
-
-            var canon = GetCanonChar(direction);
-            var canonPos = GetCanonPosition();
-            renderer.SetPixel(canonPos.X, canonPos.Y, canon, 2);
         }
     }
 
     public override void Update(float deltaTime)
     {
-        //throw new NotImplementedException();
         _moveCooldown += deltaTime;
         _shootCooldown += deltaTime;
         if (_moveCooldown >= _moveCooldownTime)

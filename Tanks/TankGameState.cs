@@ -42,7 +42,7 @@ internal class TankGameState : GameStateBase
     {
         GameOver = false;
         HasWon = false;
-        Player.Position = new(6, 6);
+        Player.Position = new(1, 1);
         Player.Health = 3;
     }
 
