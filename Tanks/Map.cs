@@ -12,17 +12,17 @@ internal class Map : IRenderable, IUpdateable
     public Map(char[,] map)
     {
         _map = map;
-        for (int h = 0; h < _map.GetLength(0); h++)
+        for (int h = 0; h < _map.GetLength(0); h += 2)
         {
-            for (int w = 0; w < _map.GetLength(1); w++)
+            for (int w = 0; w < _map.GetLength(1); w += 4)
             {
                 if (_map[h, w] == '▓')
                 {
-                    _walls.Add(new(w, h));
+                    _walls.Add(new(w / 4, h / 2));
                 }
                 else if (_map[h, w] == '█')
                 {
-                    _water.Add(new(w, h));
+                    _water.Add(new(w / 4, h / 2));
                 }
             }
         }

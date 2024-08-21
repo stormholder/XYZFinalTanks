@@ -4,7 +4,6 @@ namespace XYZFinalTanks.Tanks.Entity;
 
 internal class WallEntity : EntityBase
 {
-    public bool IsDisposed { get; private set; } = false;
     const byte colorIdx = 1;
     const char healthy = '▓';
     const char damaged = '░';
@@ -16,16 +15,17 @@ internal class WallEntity : EntityBase
         Position = new Cell(x, y);
     }
 
-    public override void Dispose()
-    {
-        IsDisposed = true;
-    }
-
     public override void Render(IRenderer renderer)
     {
         if (Health > 0)
         {
-            renderer.SetPixel(Position.X, Position.Y, Health == 2 ? healthy : damaged, colorIdx);
+            for (int i = 0; i < Position.Height; i++)
+            {
+                for (int j = 0; j < Position.Width; j++)
+                {
+                    renderer.SetPixel(Position.X * Position.Width + j, Position.Y * Position.Height + i, Health == 2 ? healthy : damaged, colorIdx);
+                }
+            }
         }
     }
 

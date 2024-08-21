@@ -12,10 +12,18 @@ internal class WaterEntity : EntityBase
     }
     public override void Render(IRenderer renderer)
     {
-        renderer.SetPixel(Position.X, Position.Y, symbol, 3);
+        for (int i = 0; i < Position.Height; i++)
+        {
+            for (int j = 0; j < Position.Width; j++)
+            {
+                renderer.SetPixel(Position.X * Position.Width + j, Position.Y * Position.Height + i, symbol, 3);
+            }
+        }
     }
 
     public override void Update(float deltaTime)
     {
     }
+
+    public override void Dispose() {}
 }
