@@ -27,9 +27,17 @@ internal class Map : IRenderable, IUpdateable
             }
         }
     }
-    public int Width => _map.GetLength(1);
-    public int Height => _map.GetLength(0);
+    public int Width => _map.GetLength(1) / 4;
+    public int Height => _map.GetLength(0) / 2;
     public List<WallEntity> Walls => _walls;
+    public List<WaterEntity> Water => _water;
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Map map &&
+               EqualityComparer<List<WaterEntity>>.Default.Equals(Water, map.Water) &&
+               EqualityComparer<List<WallEntity>>.Default.Equals(Walls, map.Walls);
+    }
 
     public bool IsValid(Cell cell)
     {
@@ -82,4 +90,6 @@ internal class Map : IRenderable, IUpdateable
             wall.Update(deltaTime);
         }
     }
+
+
 }

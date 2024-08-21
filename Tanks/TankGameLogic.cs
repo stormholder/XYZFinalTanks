@@ -35,6 +35,7 @@ internal class TankGameLogic : GameLogicBase
     {
         _state.Level = currLevel;
         _state.Map = new(gameData.LevelMaps[currLevel]);
+        _state.EntityPool.SetMap(_state.Map);
         _state.FieldHeight = screenHeight;
         _state.FieldWidth = screenWidth;
         ChangeState(_state);
@@ -74,7 +75,8 @@ internal class TankGameLogic : GameLogicBase
         if (currentState != _state) return;
         var newBullet = _state.Player.Shoot();
         if (newBullet != null)
-            _state.Bullets.Add(newBullet);
+            _state.EntityPool.AddBullet(newBullet);
+            //_state.Bullets.Add(newBullet);
     }
 
     public override void Update(float deltaTime)
