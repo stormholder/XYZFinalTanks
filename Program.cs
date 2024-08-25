@@ -18,7 +18,7 @@ internal class Program
         gameLogic.InitializeInput(input);
 
         var lastFrameTime = DateTime.Now;
-        while (true)
+        while (!gameLogic.CanExit)
         {
             var frameStartTime = DateTime.Now;
             float deltaTime = (float)(frameStartTime - lastFrameTime).TotalSeconds;

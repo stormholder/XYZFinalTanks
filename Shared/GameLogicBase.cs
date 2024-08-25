@@ -9,6 +9,7 @@ internal abstract class GameLogicBase : IArrowListener, IEscListener, IShootList
     protected float time { get; private set; }
     protected int screenWidth { get; private set; }
     protected int screenHeight { get; private set; }
+    public bool CanExit { get; protected set; } = false;
 
     public void InitializeInput(ConsoleInput input)
     {

@@ -40,6 +40,7 @@ internal class ConsoleInput
                     break;
                 case ConsoleKey.Spacebar:
                 case ConsoleKey.Enter:
+                case ConsoleKey.Z:
                     foreach (var shootListener in _shootListeners) shootListener.OnShoot();
                     break;
             }

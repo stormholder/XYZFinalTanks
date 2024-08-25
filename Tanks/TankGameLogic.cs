@@ -23,6 +23,14 @@ internal class TankGameLogic : GameLogicBase
         showTextState.text = $"Game Over!";
         ChangeState(showTextState);
     }
+    private void GotoExit()
+    {
+        currLevel = 0;
+        newGamePending = false;
+        showTextState.text = $"You won! Game Finished!";
+        ChangeState(showTextState);
+        CanExit = true;
+    }
     private void GotoNextLevel()
     {
         currLevel++;
@@ -44,30 +52,31 @@ internal class TankGameLogic : GameLogicBase
     public override void OnArrowDown()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveDown(_state.Map);
+        _state.Player.TryMoveDown(_state);
     }
 
     public override void OnArrowLeft()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveLeft(_state.Map);
+        _state.Player.TryMoveLeft(_state);
     }
 
     public override void OnArrowRight()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveRight(_state.Map);
+        _state.Player.TryMoveRight(_state);
     }
 
     public override void OnArrowUp()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveUp(_state.Map);
+        _state.Player.TryMoveUp(_state);
     }
 
     public override void OnEsc()
     {
         if (currentState != _state) return;
+        CanExit = true;
     }
 
     public override void OnShoot()
@@ -76,13 +85,16 @@ internal class TankGameLogic : GameLogicBase
         var newBullet = _state.Player.Shoot();
         if (newBullet != null)
             _state.EntityPool.AddBullet(newBullet);
-            //_state.Bullets.Add(newBullet);
     }
 
     public override void Update(float deltaTime)
     {
         if (currentState != null && !currentState.IsDone())
             return;
+        if (currLevel > gameData.LevelMaps.Count)
+        {
+            GotoGameOver();
+        }
         if (currentState == null || currentState == _state && !_state.GameOver)
         {
             GotoNextLevel();
