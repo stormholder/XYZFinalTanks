@@ -55,14 +55,6 @@ internal class Map : IRenderable, IUpdateable
                 break;
             }
         }
-        foreach (var wall in _walls)
-        {
-            if (wall.Position.X == cell.X && wall.Position.Y == cell.Y)
-            {
-                result = false;
-                break;
-            }
-        }
         return result;
     }
 

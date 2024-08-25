@@ -9,6 +9,7 @@ internal class EntityPool : IUpdateable, IRenderable
     public List<TankEntity> Tanks = new();
     public List<Bullet> Bullets = new();
     private Map _map;
+    private Random _rand = new Random();
 
     public void SetMap(Map map)
     {
@@ -25,6 +26,49 @@ internal class EntityPool : IUpdateable, IRenderable
         Tanks.Add(tank);
     }
 
+    private EntityBase? GetEntityCollision(Cell cell, IEnumerable<EntityBase> entities)
+    {
+        EntityBase? result = null;
+        foreach (var entity in entities)
+        {
+            if (entity.Position.X == cell.X && entity.Position.Y == cell.Y)
+            {
+                result = entity;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public EntityBase? HasCollisions(Cell cell)
+    {
+        EntityBase? result = GetEntityCollision(cell, _map.Walls);
+        if (result == null)
+            result = GetEntityCollision(cell, Tanks);
+        return result;
+    }
+
+    public Cell? GetRandomValidPoint()
+    {
+        bool found = false;
+        Cell validPoint = new(0, 0);
+        for (var y = _rand.Next(0, _map.Height); y < _map.Height; y++)
+        {
+            if (found)
+                break;
+            for (var x = _rand.Next(0, _map.Width); x < _map.Width; x++)
+            {
+                if (found)
+                    break;
+                validPoint.X = x;
+                validPoint.Y = y;
+                found = _map.IsValid(validPoint) && 
+                    HasCollisions(validPoint) == null;
+            }
+        }
+        return found ? validPoint : null;
+    }
+
     public void RemoveDisposedEntities()
     {
         var bulletsToDispose = Bullets.Where(b => b.IsDisposed).ToList();
@@ -35,11 +79,8 @@ internal class EntityPool : IUpdateable, IRenderable
         var tanksToDispose = Tanks.Where(t => t.IsDisposed).ToList();
         foreach (var tank in tanksToDispose)
         {
-            if (tank is EnemyEntity enemy)
-            {
-                OnKill?.Invoke();
-            }
             Tanks.Remove(tank);
+            OnKill?.Invoke();
         }
     }
 
@@ -56,27 +97,18 @@ internal class EntityPool : IUpdateable, IRenderable
                 {
                     bullet.Dispose();
                 }
-                foreach (var wall in _map.Walls)
+                var e = HasCollisions(bullet.Position);
+                if (e != null)
                 {
-                    if (wall.Position.X == bullet.Position.X && wall.Position.Y == bullet.Position.Y)
-                    {
-                        wall.Health--;
-                        bullet.Dispose();
-                        break;
-                    }
-                }
-                foreach (var tank in Tanks)
-                {
-                    tank.Update(deltaTime);
-                    if (tank.Position.X == bullet.Position.X && tank.Position.Y == bullet.Position.Y)
-                    {
-                        tank.Health--;
-                        bullet.Dispose();
-                    }
+                    e.Health--;
+                    bullet.Dispose();
                 }
                 bullet.Update(deltaTime);
             }
         }
+        foreach (var tank in Tanks)
+            if (!tank.IsDisposed)
+                tank.Update(deltaTime);
         RemoveDisposedEntities();
     }
 
@@ -94,5 +126,11 @@ internal class EntityPool : IUpdateable, IRenderable
                 tank.Render(renderer);
             }
         }
+    }
+
+    public void Clear()
+    {
+        Bullets.Clear();
+        Tanks.Clear();
     }
 }

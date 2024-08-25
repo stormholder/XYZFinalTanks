@@ -15,14 +15,17 @@ internal class TankGameState : GameStateBase, IDisposable
     public bool HasWon { get; private set; }
     public Map Map { get; set; }
 
-    public PlayerEntity Player = new();
+    public PlayerEntity Player;
     private EntityPool _entityPool = new();
     public EntityPool EntityPool => _entityPool;
 
     private void OnKill()
     {
         Score = Score + 1;
-        HasWon = (Score == Level);
+        HasWon = !_entityPool.Tanks
+            .Where(t => t.IsDisposed == false)
+            .Where(t => t is EnemyEntity)
+            .Any();
     }
 
     public TankGameState()
@@ -49,7 +52,6 @@ internal class TankGameState : GameStateBase, IDisposable
     public override void Render(IRenderer renderer)
     {
         Map.Render(renderer);
-        Player.Render(renderer);
         _entityPool.Render(renderer);
         RenderState(renderer);    
     }
@@ -63,24 +65,43 @@ internal class TankGameState : GameStateBase, IDisposable
     {
         GameOver = false;
         HasWon = false;
-        Score = 0;
-        Player.Position = new(1, 1);
-        Player.Health = 3;
-        TankEntity enemy = new EnemyEntity();
-        enemy.Position = new(1, 9);
-        enemy.Health = 3;
-        _entityPool.AddTank(enemy);
+        _entityPool.Clear();
+        Cell? playerPos = null;
+        while(playerPos == null)
+            playerPos =  _entityPool.GetRandomValidPoint();
+        var player = new PlayerEntity
+        {
+            Health = 3,
+            Position = (Cell)playerPos
+        };
+        _entityPool.AddTank(player);
+        Player = (PlayerEntity)_entityPool.Tanks[0];
+        for (var i = 0; i < Level; i++)
+        {
+            Cell? enemyPos = null;
+            while (enemyPos == null)
+            {
+                enemyPos = _entityPool.GetRandomValidPoint();
+            }
+            TankEntity enemy = new EnemyEntity
+            {
+                Health = 3,
+                Position = (Cell)enemyPos
+            };
+            _entityPool.AddTank(enemy);
+        }
+        
     }
 
     public override void Update(float deltaTime)
     {
         Map.Update(deltaTime);
-        Player.Update(deltaTime);
         _entityPool.Update(deltaTime);
     }
 
     public void Dispose()
     {
         _entityPool.OnKill -= OnKill;
+        _entityPool.Clear();
     }
 }
