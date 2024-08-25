@@ -43,13 +43,13 @@ internal class EnemyEntity : TankEntity
         while (true)
         {
             c = Shift(direction, c);
+            if (c.X < 0 || c.Y < 0 || c.X >= state.Map.Width || c.Y >= state.Map.Height)
+                break;
             var collider = state.EntityPool.HasCollisions(c);
             if (collider == null || Position.X == collider.Position.X && Position.Y == collider.Position.Y)
                 continue;
             if (collider is PlayerEntity)
-            {
                 _seesPlayer = true;
-            }
             break;
         }
     }
@@ -66,19 +66,22 @@ internal class EnemyEntity : TankEntity
             _seesPlayer = false;
         }
         var nextPosition = pathfinder.GetNextCellFrom(Position);
-        if (nextPosition != null)
+        if (nextPosition.HasValue)
         {
-            direction = GetNewDirection((Cell)nextPosition);
-            bool result = TryChangePosition((Cell)nextPosition);
-            if (result)
+
+            direction = GetNewDirection(nextPosition.Value);
+            if (TryChangePosition(nextPosition.Value))
             {
-                Position = (Cell)nextPosition;
+                Position = nextPosition.Value;
                 canMove = false;
-            } else
+            }
+            else
             {
-                if (nextPosition.Value.X != Position.X &&
-                    nextPosition.Value.Y != Position.Y)
-                pathfinder.Reset();
+                var collider = state.EntityPool.GetEntityCollision(nextPosition.Value, state.EntityPool.Tanks);
+                if (collider != null && collider != this)
+                {
+                    pathfinder.Reset();
+                }
             }
         }
     }
