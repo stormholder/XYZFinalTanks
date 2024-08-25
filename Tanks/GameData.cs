@@ -2,17 +2,16 @@
 
 internal class GameData
 {
-    //private Dictionary<int, string> _levelMapNumbers = [];
     private Dictionary<int, char[,]> _levelMaps = [];
     private readonly ConsoleColor[] _palette = [
                 ConsoleColor.Green,
                 ConsoleColor.Red,
                 ConsoleColor.White,
                 ConsoleColor.Blue,
+                ConsoleColor.Yellow
             ];
 
     public Dictionary<int, char[,]> LevelMaps => _levelMaps;
-    //public Dictionary<int, string> LevelMapNumbers => _levelMapNumbers;
     public ConsoleColor[] Palette => _palette;
 
     public GameData(string resourcesFolder)
@@ -30,7 +29,6 @@ internal class GameData
             if (f == null)
                 continue;
             var parts = f.Replace(".map.txt", "").Split('_');
-            //_levelMapNumbers.Add(int.Parse(parts[1]), $"{parts[0]} {parts[1]}");
             var levelMap = ReadFileToMap(file);
             _levelMaps.Add(int.Parse(parts[1]), levelMap);
         }
@@ -40,7 +38,7 @@ internal class GameData
     {
         var fs = File.OpenRead(filePath);
         using var sr = new StreamReader(fs);
-        List<string> lines = new List<string>();
+        List<string> lines = [];
         string line;
         while ((line = sr.ReadLine()) != null)
         {

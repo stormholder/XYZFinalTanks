@@ -16,13 +16,15 @@ internal class Bullet : EntityBase
     public Bullet(Cell position, Direction direction)
     {
         Position = position;
+        Shift(direction);
         _direction = direction;
     }
 
     public override void Render(IRenderer renderer)
     {
-        if (IsDisposed || 
-            Position.X < 0 || 
+        if (IsDisposed)
+            return;
+        if (Position.X < 0 || 
             Position.Y < 0 || 
             Position.X >= renderer.GetWidth() || 
             Position.Y >= renderer.GetHeight())
@@ -31,7 +33,7 @@ internal class Bullet : EntityBase
         {
             for (int j = 0; j < Position.Width; j++)
             {
-                renderer.SetPixel(Position.X * Position.Width + j, Position.Y * Position.Height + i, bullet[i, j], 2);
+                renderer.SetPixel(Position.X * Position.Width + j, Position.Y * Position.Height + i, bullet[i, j], 4);
             }
         }
     }
