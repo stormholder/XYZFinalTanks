@@ -11,6 +11,7 @@ internal class TankEntity : EntityBase
     private float _moveCooldown = 0f;
 
     protected byte color = 2;
+    protected TankGameState state;
 
     private readonly Dictionary<Direction, char[,]> _views = new Dictionary<Direction, char[,]>
     {
@@ -40,74 +41,75 @@ internal class TankEntity : EntityBase
         }
     };
 
-    private Direction direction = Direction.Right;
+    protected Direction direction = Direction.Right;
     public Direction Direction { get { return direction; } set { direction = value; } }
 
-    public TankEntity()
+    public TankEntity(TankGameState state)
     {
+        this.state = state;
         Health = 3;
     }
 
 
-    private bool _canMove = true;
-    private bool _canShoot = true;
+    protected bool canMove = true;
+    protected bool canShoot = true;
 
-    public bool CanShoot => _canShoot;
+    public bool CanShoot => canShoot;
 
-    protected bool TryChangePosition(Cell newPosition, TankGameState state)
+    protected bool TryChangePosition(Cell newPosition)
     {
-        return _canMove && 
+        return canMove && 
             state.Map.IsValid(newPosition) && 
             state.EntityPool.HasCollisions(newPosition) == null;
     }
 
-    public virtual bool TryMoveLeft(TankGameState state)
+    public virtual bool TryMoveLeft()
     {
         Direction = Direction.Left;
-        bool result = TryChangePosition(new Cell(Position.X - 1, Position.Y), state);
+        bool result = TryChangePosition(new Cell(Position.X - 1, Position.Y));
         if (result)
         {
             Position = new Cell(Position.X - 1, Position.Y);
-            _canMove = false;
+            canMove = false;
             return true;
         }
         return false;
     }
 
-    public virtual bool TryMoveRight(TankGameState state)
+    public virtual bool TryMoveRight()
     {
         Direction = Direction.Right;
-        bool result = TryChangePosition(new Cell(Position.X + 1, Position.Y), state);
+        bool result = TryChangePosition(new Cell(Position.X + 1, Position.Y));
         if (result)
         {
             Position = new Cell(Position.X + 1, Position.Y);
-            _canMove = false;
+            canMove = false;
             return true;
         }
         return false;
     }
 
-    public virtual bool TryMoveUp(TankGameState state)
+    public virtual bool TryMoveUp()
     {
         Direction = Direction.Up;
-        bool result = TryChangePosition(new Cell(Position.X, Position.Y - 1), state);
+        bool result = TryChangePosition(new Cell(Position.X, Position.Y - 1));
         if (result)
         {
             Position = new Cell(Position.X, Position.Y - 1);
-            _canMove = false;
+            canMove = false;
             return true;
         }
         return false;
     }
 
-    public virtual bool TryMoveDown(TankGameState state)
+    public virtual bool TryMoveDown()
     {
         Direction = Direction.Down;
-        bool result = TryChangePosition(new Cell(Position.X, Position.Y + 1), state);
+        bool result = TryChangePosition(new Cell(Position.X, Position.Y + 1));
         if (result)
         {
             Position = new Cell(Position.X, Position.Y +  1);
-            _canMove = false;
+            canMove = false;
             return true;
         }
         return false;
@@ -116,13 +118,11 @@ internal class TankEntity : EntityBase
     public override void Render(IRenderer renderer)
     {
         if (IsDisposed) return;
+        for (var x = 0; x < Position.Height; x++)
         {
-            for (var x = 0; x < Position.Height; x++)
+            for (var y = 0; y < Position.Width; y++)
             {
-                for (var y = 0; y < Position.Width; y++)
-                {
-                    renderer.SetPixel(Position.X * Position.Width + y, Position.Y * Position.Height + x, _views[direction][x,y], color);
-                }
+                renderer.SetPixel(Position.X * Position.Width + y, Position.Y * Position.Height + x, _views[direction][x,y], color);
             }
         }
     }
@@ -137,21 +137,21 @@ internal class TankEntity : EntityBase
         if (_moveCooldown >= _moveCooldownTime)
         {
             _moveCooldown = 0;
-            _canMove = true;
+            canMove = true;
         }
         if (_shootCooldown >= _shootCooldownTime)
         {
             _shootCooldown = 0;
-            _canShoot = true;
+            canShoot = true;
         }
     }
 
     public virtual Bullet? Shoot()
     {
         if (IsDisposed) return null;
-        if (_canShoot)
+        if (canShoot)
         {
-            _canShoot = false;
+            canShoot = false;
             return BulletFactory.GetInstance().CreateBullet(Position, direction);
         }
         return null;

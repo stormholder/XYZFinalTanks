@@ -52,25 +52,25 @@ internal class TankGameLogic : GameLogicBase
     public override void OnArrowDown()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveDown(_state);
+        _state.Player.TryMoveDown();
     }
 
     public override void OnArrowLeft()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveLeft(_state);
+        _state.Player.TryMoveLeft();
     }
 
     public override void OnArrowRight()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveRight(_state);
+        _state.Player.TryMoveRight();
     }
 
     public override void OnArrowUp()
     {
         if (currentState != _state) return;
-        _state.Player.TryMoveUp(_state);
+        _state.Player.TryMoveUp();
     }
 
     public override void OnEsc()
@@ -93,13 +93,13 @@ internal class TankGameLogic : GameLogicBase
             return;
         if (currLevel > gameData.LevelMaps.Count)
         {
-            GotoGameOver();
+            GotoExit();
         }
         if (currentState == null || currentState == _state && !_state.GameOver)
         {
             GotoNextLevel();
         }
-        else if (currentState == _state && !_state.GameOver)
+        else if (currentState == _state && _state.GameOver)
         {
             GotoGameOver();
         }

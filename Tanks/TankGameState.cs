@@ -69,7 +69,7 @@ internal class TankGameState : GameStateBase, IDisposable
         Cell? playerPos = null;
         while(playerPos == null)
             playerPos =  _entityPool.GetRandomValidPoint();
-        var player = new PlayerEntity
+        var player = new PlayerEntity(this)
         {
             Health = 3,
             Position = (Cell)playerPos
@@ -83,7 +83,7 @@ internal class TankGameState : GameStateBase, IDisposable
             {
                 enemyPos = _entityPool.GetRandomValidPoint();
             }
-            TankEntity enemy = new EnemyEntity
+            TankEntity enemy = new EnemyEntity(this)
             {
                 Health = 3,
                 Position = (Cell)enemyPos
@@ -95,6 +95,7 @@ internal class TankGameState : GameStateBase, IDisposable
 
     public override void Update(float deltaTime)
     {
+        GameOver = Player.IsDisposed;
         Map.Update(deltaTime);
         _entityPool.Update(deltaTime);
     }
