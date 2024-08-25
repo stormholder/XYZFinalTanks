@@ -54,15 +54,17 @@ internal class TankEntity : EntityBase
 
     public bool CanShoot => _canShoot;
 
-    protected bool TryChangePosition(Cell newPosition, Map map)
+    protected bool TryChangePosition(Cell newPosition, TankGameState state)
     {
-        return _canMove && map.IsValid(newPosition);
+        return _canMove && 
+            state.Map.IsValid(newPosition) && 
+            state.EntityPool.HasCollisions(newPosition) == null;
     }
 
-    public virtual bool TryMoveLeft(Map map)
+    public virtual bool TryMoveLeft(TankGameState state)
     {
         Direction = Direction.Left;
-        bool result = TryChangePosition(new Cell(Position.X - 1, Position.Y), map);
+        bool result = TryChangePosition(new Cell(Position.X - 1, Position.Y), state);
         if (result)
         {
             Position = new Cell(Position.X - 1, Position.Y);
@@ -72,10 +74,10 @@ internal class TankEntity : EntityBase
         return false;
     }
 
-    public virtual bool TryMoveRight(Map map)
+    public virtual bool TryMoveRight(TankGameState state)
     {
         Direction = Direction.Right;
-        bool result = TryChangePosition(new Cell(Position.X + 1, Position.Y), map);
+        bool result = TryChangePosition(new Cell(Position.X + 1, Position.Y), state);
         if (result)
         {
             Position = new Cell(Position.X + 1, Position.Y);
@@ -85,10 +87,10 @@ internal class TankEntity : EntityBase
         return false;
     }
 
-    public virtual bool TryMoveUp(Map map)
+    public virtual bool TryMoveUp(TankGameState state)
     {
         Direction = Direction.Up;
-        bool result = TryChangePosition(new Cell(Position.X, Position.Y - 1), map);
+        bool result = TryChangePosition(new Cell(Position.X, Position.Y - 1), state);
         if (result)
         {
             Position = new Cell(Position.X, Position.Y - 1);
@@ -98,10 +100,10 @@ internal class TankEntity : EntityBase
         return false;
     }
 
-    public virtual bool TryMoveDown(Map map)
+    public virtual bool TryMoveDown(TankGameState state)
     {
         Direction = Direction.Down;
-        bool result = TryChangePosition(new Cell(Position.X, Position.Y + 1), map);
+        bool result = TryChangePosition(new Cell(Position.X, Position.Y + 1), state);
         if (result)
         {
             Position = new Cell(Position.X, Position.Y +  1);
@@ -114,7 +116,6 @@ internal class TankEntity : EntityBase
     public override void Render(IRenderer renderer)
     {
         if (IsDisposed) return;
-        //if (Health > 0)
         {
             for (var x = 0; x < Position.Height; x++)
             {
