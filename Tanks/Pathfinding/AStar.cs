@@ -1,6 +1,6 @@
 ﻿namespace XYZFinalTanks.Tanks.Pathfinding;
 
-internal class AStar : IPathfinder
+internal abstract class AStar : IPathfinder
 {
     private int[] dx = { -1, 0, 1, 0 };
     private int[] dy = { 0, 1, 0, -1 };
@@ -59,8 +59,7 @@ internal class AStar : IPathfinder
         return null;
     }
 
-    public bool IsValid(int x, int y)
-    {
-        throw new NotImplementedException();
-    }
+    public abstract Cell? GetNextCellFrom(Cell from);
+    public abstract bool IsValid(int x, int y);
+    public abstract void Reset();
 }
