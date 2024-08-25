@@ -26,7 +26,7 @@ internal class EntityPool : IUpdateable, IRenderable
         Tanks.Add(tank);
     }
 
-    private EntityBase? GetEntityCollision(Cell cell, IEnumerable<EntityBase> entities)
+    public EntityBase? GetEntityCollision(Cell cell, IEnumerable<EntityBase> entities)
     {
         EntityBase? result = null;
         foreach (var entity in entities)
@@ -42,9 +42,8 @@ internal class EntityPool : IUpdateable, IRenderable
 
     public EntityBase? HasCollisions(Cell cell)
     {
-        EntityBase? result = GetEntityCollision(cell, _map.Walls);
-        if (result == null)
-            result = GetEntityCollision(cell, Tanks);
+        var result = GetEntityCollision(cell, _map.Walls);
+        result ??= GetEntityCollision(cell, Tanks);
         return result;
     }
 
