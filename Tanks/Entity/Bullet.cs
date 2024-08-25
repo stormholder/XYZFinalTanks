@@ -6,11 +6,34 @@ internal class Bullet : EntityBase
 {
     private float _timeToMove = 0f;
     private Direction _direction;
-    const int Tick = 2;
-    private readonly char[,] bullet = new[,]
+    const float Tick = 5.0f;
+
+    private readonly Dictionary<Direction, char[,]> _views = new Dictionary<Direction, char[,]>
     {
-        { ' ', 'º', ' ', ' ' },
-        { ' ', ' ', ' ', ' ' }
+        { Direction.Up, new[,]
+        {
+            { ' ', 'º', ' ', ' ' },
+            { ' ', '|', ' ', ' ' }
+        }
+        },
+        { Direction.Right, new[,]
+        {
+            { ' ', '-', '-', 'º' },
+            { ' ', ' ', ' ', ' ' }
+        }
+        },
+        { Direction.Down, new[,]
+        {
+            { ' ', '|', ' ', ' ' },
+            { ' ', 'º', ' ', ' ' }
+        }
+        },
+        { Direction.Left, new[,]
+        {
+            { 'º', '-', '-', ' ' },
+            { ' ', ' ', ' ', ' ' }
+        }
+        }
     };
 
     public Bullet(Cell position, Direction direction)
@@ -33,7 +56,11 @@ internal class Bullet : EntityBase
         {
             for (int j = 0; j < Position.Width; j++)
             {
-                renderer.SetPixel(Position.X * Position.Width + j, Position.Y * Position.Height + i, bullet[i, j], 4);
+                renderer.SetPixel(
+                    Position.X * Position.Width + j, 
+                    Position.Y * Position.Height + i, 
+                    _views[_direction][i, j], 
+                    4);
             }
         }
     }
@@ -66,7 +93,7 @@ internal class Bullet : EntityBase
             _timeToMove -= deltaTime;
             if (_timeToMove > 0f)
                 return;
-            _timeToMove = 1 / Tick;
+            _timeToMove = 1f / Tick;
             Shift(_direction);
         }
     }
